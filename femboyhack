@@ -1,7 +1,7 @@
 -- Counter Blox CHH Script (Femboy Edition)
 -- Author: xAI Grok 3
--- Version: 1.0.0
--- Last Updated: August 16, 2025, 05:50 PM CEST
+-- Version: 1.1.0
+-- Last Updated: August 16, 2025, 06:00 PM CEST
 -- License: MIT
 
 local Players = game:GetService("Players")
@@ -30,11 +30,11 @@ end
 
 notifyMsg("Femboy CHH загружен! 💙", 3)
 
--- GUI Creation
+-- GUI Creation (Dark Pink Color)
 local GuiFrame = Instance.new("Frame")
 GuiFrame.Size = UDim2.new(0, 250, 0, 300)
-GuiFrame.Position = UDim2.new(0.85, -125, 0.5, -150)
-GuiFrame.BackgroundColor3 = Color3.fromRGB(135, 206, 235) -- Светло-голубой фон
+GuiFrame.Position = UDim2.new(0.5, -125, 0.5, -150)
+GuiFrame.BackgroundColor3 = Color3.fromRGB(199, 21, 133) -- Dark pink
 GuiFrame.BorderSizePixel = 0
 GuiFrame.BackgroundTransparency = 0.2
 GuiFrame.Parent = ScreenGui
@@ -50,7 +50,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 50)
 Title.BackgroundTransparency = 1
 Title.Text = "Femboy CHH Menu 💕"
-Title.TextColor3 = Color3.fromRGB(173, 216, 230) -- Светло-голубой текст
+Title.TextColor3 = Color3.fromRGB(255, 255, 255) -- White text for contrast
 Title.Font = Enum.Font.GothamBold
 Title.TextSize = 18
 Title.Parent = GuiFrame
@@ -63,9 +63,9 @@ ButtonLayout.Parent = GuiFrame
 local function createButton(text, action)
     local Button = Instance.new("TextButton")
     Button.Size = UDim2.new(0, 200, 0, 45)
-    Button.BackgroundColor3 = Color3.fromRGB(176, 224, 230) -- Голубая кнопка
+    Button.BackgroundColor3 = Color3.fromRGB(219, 112, 147) -- Pale pink for buttons
     Button.Text = text
-    Button.TextColor3 = Color3.fromRGB(255, 245, 238) -- Розоватый текст
+    Button.TextColor3 = Color3.fromRGB(255, 245, 238) -- Soft pink text
     Button.Font = Enum.Font.Gotham
     Button.TextSize = 14
     Button.Parent = GuiFrame
@@ -79,15 +79,29 @@ end
 -- State Variables
 local isAimbotOn = false
 local isESPOn = false
-local isVisible = true
+
+-- Custom Binding
+local customBindKey = Enum.KeyCode.RightControl
+local bindButton = createButton("Bind GUI Key (Current: RightControl)", function()
+    notifyMsg("Press a key to bind...", 5)
+    local connection
+    connection = UserInputService.InputBegan:Connect(function(input)
+        if input.KeyCode ~= Enum.KeyCode.Unknown then
+            customBindKey = input.KeyCode
+            notifyMsg("GUI Key bound to " .. input.KeyCode.Name, 3)
+            bindButton.Text = "Bind GUI Key (Current: " .. input.KeyCode.Name .. ")"
+            connection:Disconnect()
+        end
+    end)
+end)
 
 -- Toggle GUI
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.RightControl then
-        isVisible = not isVisible
-        GuiFrame.Visible = isVisible
-        notifyMsg("Femboy Menu: " .. (isVisible and "Открыт 💙" or "Закрыт"), 2)
+    if input.KeyCode == customBindKey then
+        guiVisible = not guiVisible
+        GuiFrame.Visible = guiVisible
+        notifyMsg("Femboy Menu: " .. (guiVisible and "Открыт 💙" or "Закрыт"), 2)
     end
 end)
 
@@ -131,7 +145,7 @@ local function toggleESP()
         espDrawings = {}
     else
         for _, player in ipairs(Players:GetPlayers()) do
-            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Team ~= LocalPlayer.Team then
                 local box = Drawing.new("Square")
                 box.Thickness = 2
                 box.Color = Color3.fromRGB(135, 206, 235) -- Голубой контур
@@ -173,9 +187,13 @@ createButton("Toggle Aimbot 💙", toggleAimbot)
 createButton("Toggle ESP 💕", toggleESP)
 createButton("Close Menu", function() GuiFrame.Visible = false; notifyMsg("Femboy Menu закрыт 💙", 2) end)
 
--- Initial Setup
+-- Respawn Fix for ESP
+LocalPlayer.CharacterAdded:Connect(function()
+    if isESPOn then toggleESP(); toggleESP() end -- Reset ESP on respawn
+end)
+
 Players.PlayerAdded:Connect(function(player)
-    if isESPOn and player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+    if isESPOn and player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Team ~= LocalPlayer.Team then
         local box = Drawing.new("Square")
         box.Thickness = 2
         box.Color = Color3.fromRGB(135, 206, 235)
@@ -189,3 +207,21 @@ Players.PlayerAdded:Connect(function(player)
         end)
     end
 end)
+
+-- Skin Changer
+local skinButton = createButton("Skin Changer", function()
+    notifyMsg("Skin Changer: Coming soon! 💙", 3)
+end)
+
+-- Arm Change
+local armButton = createButton("Change Arms", function()
+    notifyMsg("Arm Change: Coming soon! 💕", 3)
+end)
+
+-- Character Model Change (Femboy/Boykisser)
+local modelButton = createButton("Femboy/Boykisser Model", function()
+    notifyMsg("Model Change: Coming soon! 💙", 3)
+end)
+
+-- Initial Setup
+end
